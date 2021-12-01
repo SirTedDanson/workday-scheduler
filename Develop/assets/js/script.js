@@ -37,10 +37,15 @@ var createSchedule = function () {
     // check time block and color code
     auditSchedule(timeBlockEl, hourDue);
   };
+  // periodically check time while on page
+  setInterval(function() {
+    auditSchedule(timeBlockEl, hourDue);
+  }, 5000);
 };
 
 // ---------------------------- COLOR CODING FUNCTION ------------------------------
 var auditSchedule = function(timeBlock, hour) {
+  // get difference in hours between current time and the time block hour
   var timeDiff = hour.diff(currentDay)/60/60/1000;
 
   // remove old classes from element
