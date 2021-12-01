@@ -1,31 +1,64 @@
 
 var currentDayEl = document.getElementById("currentDay");
-var currentDay = moment().format("dddd, MMMM Do");
+var currentDay = moment();
 
-// currentTime.add(9, "hours");
-console.log(currentDay);
+// dynamically change amount of work hours
+var workHours = 8;
+// dynamically change schedule start. 
+// format: "HOUR(AM/PM)" 
+var workDayStart = "9AM"
 
-// display current day of the month at the top of scheduler
-currentDayEl.textContent = currentDay;
+// ------------------------------ CREATE DOM ELEMENTS -----------------------------
+var createSchedule = function () {
+  // display current day of the month at the top of scheduler
+  currentDayEl.textContent = currentDay.format("dddd, MMMM Do");
+  // loop to create time blocks
+  for (i = 0; i < (workHours+1); i++) {
+    // work scheduler hour due
+    var hourDue = moment(workDayStart, "hA").add(i, "hour");
+    // dynamically create time blocks with jquery
+    var timeBlockEl = $("<div>")
+      .addClass("row time-block");
+    var timeBlockLabel = $("<label>")
+      .addClass("col-1 hour")
+      .text(hourDue.format("hA"));
+    var timeBlockText = $("<textarea>")
+      .addClass("col description");
+    var timeBlockButton = $("<button>")
+      .addClass("col-1 saveBtn");
+    var saveIcon = $("<i>")
+      .addClass("fas fa-save");
 
-// loop to create time blocks (temp time text)
-for (i = 0; i < 9; i++) {
-  // work scheduler start time
-  var startTime = moment("9AM", "hA").add(i, "hour").format("hA");
-  // dynamically create time blocks with jquery
-  var timeBlockEl = $("<div>")
-    .addClass("row time-block");
-  var timeBlockLabel = $("<label>")
-    .addClass("col-1 hour")
-    .text(startTime);
-  var timeBlockText = $("<textarea>")
-    .addClass("col description past");
-  var timeBlockButton = $("<button>")
-    .addClass("col-1 saveBtn");
-  var saveIcon = $("<i>")
-    .addClass("fas fa-save");
+    // append elements together
+    timeBlockButton.append(saveIcon);
+    timeBlockEl.append(timeBlockLabel, timeBlockText, timeBlockButton);
+    $(".container").append(timeBlockEl);
+    
+    // check time block and color code
+    auditSchedule(timeBlockEl, hourDue);
+  };
+};
 
-  timeBlockButton.append(saveIcon);
-  timeBlockEl.append(timeBlockLabel, timeBlockText, timeBlockButton);
-  $(".container").append(timeBlockEl);
-}
+// ---------------------------- COLOR CODING FUNCTION ------------------------------
+var auditSchedule = function(timeBlock, hour) {
+  var timeDiff = hour.diff(currentDay)/60/60/1000;
+
+  // remove old classes from element
+  $(timeBlock).removeClass("past present future")
+
+  // highlight time block based on conditions
+  // if timeblock is 1 hour or greater before the current time add class 'past'
+  if (timeDiff <= -1){
+    $(timeBlock).addClass("past")
+  }
+  // if timeblock is in the current hour add class 'present'
+  else if (timeDiff <= 0) {
+    $(timeBlock).addClass("present")
+  }
+  // if timeblock is 1 hour or greater after the current time add class 'future'
+  else if (timeDiff >= 0) {
+    $(timeBlock).addClass("future")
+  }
+};
+
+createSchedule();
