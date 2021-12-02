@@ -49,15 +49,15 @@ var createSchedule = function (scheduledTasks) {
     var timeBlockEl = $("<div>")
       .addClass("row time-block");
     var timeBlockLabel = $("<label>")
-      .addClass("col-1 hour")
+      .addClass("col-md-1 col-2 text-nowrap hour")
       // text is the work hour, beginning with the work day start time
       .text(displayedHour);
     var timeBlockText = $("<textarea>")
-      .addClass("col description")
+      .addClass("col-md col-8 description")
       // time block text is loaded from the schedule 
       .text(currentTask);
     var timeBlockButton = $("<button>")
-      .addClass("col-1 saveBtn");
+      .addClass("col-md-1 col-2 saveBtn");
     var saveIcon = $("<i>")
       .addClass("fas fa-save");
 

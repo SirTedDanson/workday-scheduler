@@ -86,3 +86,14 @@ textarea:focus {
 .saveBtn:focus {
   outline: none;
 }
+/* format for smallest screens */
+@media screen and (max-width: 380px){
+ .hour {
+   padding: 2px;
+   font-size: 0.75rem;
+   font-weight: bold;
+ }
+ .display-3 {
+  font-size: 3.3rem;
+ }
+}
