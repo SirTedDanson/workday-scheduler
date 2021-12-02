@@ -21,10 +21,14 @@ var loadSchedule = function () {
     scheduledTasks.push(scheduleBlock);
     } 
   } else {
-    // schedule on page is the schedule in storage
+    // if schedule in storage, schedule on page is the schedule in storage
     scheduledTasks = schedule;
   };
+  // saveToStorage used to save blank schedule when local storage is clear
+  // otherwise this function is moot: sends what was loaded from storage right back
   saveToStorage();
+
+  // create page with tasks loaded for storage, or blank if nothing in storage
   createSchedule(scheduledTasks);
 };
 
@@ -35,10 +39,10 @@ var createSchedule = function (scheduledTasks) {
   currentDayEl.textContent = currentDay.format("dddd, MMMM Do");
 
   // loop to create schedule container elements based on how many work hours
-  for (i = 0; i < (workHours+1); i++) {
+  for (i = 0; i < (workHours+1); i++) { ////////
 
     // work schedule block hour generation 
-    var blockHour = moment(workDayStart, "hA").add(i, "hour");
+    var blockHour = moment(workDayStart, "hA").add(i, "hour"); /////////////
     var displayedHour = blockHour.format("hA");
 
     // current task is the text of the schedule at the current index
@@ -46,10 +50,10 @@ var createSchedule = function (scheduledTasks) {
 
     // -------- dynamically create DOM elements --------------
     var scheduleContainer = $(".container");
-    var timeBlockEl = $("<div>")
+    var timeBlockEl = $("<div>") /////////
       .addClass("row time-block");
     var timeBlockLabel = $("<label>")
-      .addClass("col-md-1 col-2 text-nowrap hour")
+      .addClass("col-md-1 col-2 hour")
       // text is the work hour, beginning with the work day start time
       .text(displayedHour);
     var timeBlockText = $("<textarea>")
@@ -67,25 +71,30 @@ var createSchedule = function (scheduledTasks) {
     scheduleContainer.append(timeBlockEl);
     
     // check time block's hour status and color code
-    auditSchedule(timeBlockEl, blockHour);
+    auditSchedule(timeBlockText, blockHour);
   };
   
-  // periodically check time while on page
+  // periodically check time while on page and color code
   setInterval(function() {
-    auditSchedule(timeBlockEl, blockHour);
-  }, 5000);
-};
+    var topHour = moment(workDayStart, "hA").subtract(1, "hour");
+    for (i = 0; i < (workHours+1); i++) {
+      var auditTimeBlock = $( "textarea" ).eq( i )
+      var auditHour = topHour.add(1, 'hour')
+      auditSchedule(auditTimeBlock, auditHour)
+    }
+    }, 5000);
+  };
 
 // ---------------------------- COLOR CODING FUNCTION ------------------------------
 var auditSchedule = function(timeBlock, hour) {
   // get difference in hours between current time and the time block hour
   var timeDiff = (hour.diff(currentDay)/60/60/1000);
-
+ 
   // remove old classes from element
   $(timeBlock).removeClass("past present future");
 
   // highlight time block based on time conditions
-  // if timeblock is 1 hour or greater before the current time add class 'past'
+  // if timeblock is 1 hour or more before the current time add class 'past'
   if (timeDiff <= -1){
     $(timeBlock).addClass("past");
   }
@@ -93,7 +102,7 @@ var auditSchedule = function(timeBlock, hour) {
   else if (timeDiff <= 0) {
     $(timeBlock).addClass("present");
   }
-  // if timeblock is 1 hour or greater after the current time add class 'future'
+  // if timeblock is 1 hour or more after the current time add class 'future'
   else if (timeDiff >= 0) {
     $(timeBlock).addClass("future");
   };
@@ -112,6 +121,7 @@ $(document).ready(function() {
     // grab information from text entered in the selected time block
     var index = $(this).closest(".time-block").index();
     var logText = $(this).parents(".time-block").find("textarea").val();
+    console.log(index)
 
     // update schedule array
     scheduledTasks[index].text = logText;
