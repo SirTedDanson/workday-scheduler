@@ -8,43 +8,71 @@ var workHours = 8;
 // format: "HOUR(AM/PM)" 
 var workDayStart = "9AM";
 
-// ------------------------------ CREATE DOM ELEMENTS -----------------------------
-var createSchedule = function () {
+// ------------------------------------LOAD STORED SCHEDULE------------------------------
+var loadSchedule = function () {
+  var schedule = JSON.parse(localStorage.getItem("schedule"))
+  // if no schedule in storage, create blank schedule object
+  if (schedule == null) {
+    for (i = 0; i < (workHours+1); i++) {
+    var emptyText = "";
+    var scheduleBlock = {
+      text: emptyText
+    };
+    scheduledTasks.push(scheduleBlock);
+    } 
+  } else {
+    // schedule on page is the schedule in storage
+    scheduledTasks = schedule;
+  };
+  saveToStorage();
+  createSchedule(scheduledTasks);
+};
+
+// ------------------------------ CREATE SCHEDULE ON PAGE -----------------------------
+var createSchedule = function (scheduledTasks) {
+
   // display current day of the month at the top of scheduler
   currentDayEl.textContent = currentDay.format("dddd, MMMM Do");
-  // loop to create time blocks
+
+  // loop to create schedule container elements
   for (i = 0; i < (workHours+1); i++) {
-    // work scheduler hour due
-    var hourDue = moment(workDayStart, "hA").add(i, "hour");
-    var displayedHour = hourDue.format("hA")
-    // dynamically create time blocks with jquery
+
+    // work schedule block hour generation 
+    var blockHour = moment(workDayStart, "hA").add(i, "hour");
+    var displayedHour = blockHour.format("hA");
+
+    // current task is the text of the schedule at the current index
+    var currentTask = scheduledTasks[i].text;
+
+    // -------- dynamically create DOM elements --------------
+    var scheduleContainer = $(".container");
     var timeBlockEl = $("<div>")
       .addClass("row time-block");
     var timeBlockLabel = $("<label>")
       .addClass("col-1 hour")
+      // text is the work hour, beginning with the work day start time
       .text(displayedHour);
     var timeBlockText = $("<textarea>")
       .addClass("col description")
-      .attr("id", i)
-      //.text(savedTask)
+      // time block text is loaded from the schedule 
+      .text(currentTask);
     var timeBlockButton = $("<button>")
       .addClass("col-1 saveBtn");
-
     var saveIcon = $("<i>")
       .addClass("fas fa-save");
 
     // append elements together
     timeBlockButton.append(saveIcon);
     timeBlockEl.append(timeBlockLabel, timeBlockText, timeBlockButton);
-    $(".container").append(timeBlockEl);
+    scheduleContainer.append(timeBlockEl);
     
-    // check time block and color code
-    auditSchedule(timeBlockEl, hourDue);
+    // check time block's hour status and color code
+    auditSchedule(timeBlockEl, blockHour);
   };
-
+  
   // periodically check time while on page
   setInterval(function() {
-    auditSchedule(timeBlockEl, hourDue);
+    auditSchedule(timeBlockEl, blockHour);
   }, 5000);
 };
 
@@ -71,32 +99,27 @@ var auditSchedule = function(timeBlock, hour) {
   };
 };
 
-// save to local storage
-var saveSchedule = function() {
+// save to local storage ------------------------------------
+var saveToStorage = function () {
   localStorage.setItem("schedule", JSON.stringify(scheduledTasks));
-}
+};
 
-// on load function once DOM is fully loaded
-$(document).ready(function(){
+// SAVE BUTTON CLICK ==================================== load once DOM is fully loaded
+$(document).ready(function() {
   // save time block text when clicking save button
-  $(".saveBtn").click(function(){
+  $(".saveBtn").click(function () {
 
+    // grab information from text entered in the selected time block
+    var index = $(this).closest(".time-block").index();
     var logText = $(this).parents(".time-block").find("textarea").val();
-    var logId = $(this).parents(".time-block").find("textarea").attr("id");
-    console.log(logText);
-    console.log(logId);
-    console.log("button clicked");
-    currentSchedule = {
-      id: logId,
-      text: logText
-    };
 
-    scheduledTasks.push(currentSchedule)
-    console.log(currentSchedule)
-    console.log(scheduledTasks)
-
-    saveSchedule ();
+    // update schedule array
+    scheduledTasks[index].text = logText;
+    
+    // save schedule to storage
+    saveToStorage ();
   });
 });
 
-createSchedule();
+// LAUNCH APPLICATION 
+loadSchedule();
