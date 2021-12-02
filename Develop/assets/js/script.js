@@ -34,7 +34,7 @@ var createSchedule = function (scheduledTasks) {
   // display current day of the month at the top of scheduler
   currentDayEl.textContent = currentDay.format("dddd, MMMM Do");
 
-  // loop to create schedule container elements
+  // loop to create schedule container elements based on how many work hours
   for (i = 0; i < (workHours+1); i++) {
 
     // work schedule block hour generation 
@@ -84,7 +84,7 @@ var auditSchedule = function(timeBlock, hour) {
   // remove old classes from element
   $(timeBlock).removeClass("past present future");
 
-  // highlight time block based on conditions
+  // highlight time block based on time conditions
   // if timeblock is 1 hour or greater before the current time add class 'past'
   if (timeDiff <= -1){
     $(timeBlock).addClass("past");
