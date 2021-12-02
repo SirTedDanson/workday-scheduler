@@ -86,6 +86,20 @@ textarea:focus {
 .saveBtn:focus {
   outline: none;
 }
+
+.save-alert {
+  color: grey;
+  margin: auto 40%;
+  margin-top: 30px;
+  padding: 5px auto;
+  font-style: italic;
+  font-size: 25px;
+}
+
+.padding-adj {
+  padding-bottom: 25px;
+}
+
 /* format for smallest screens */
 @media screen and (max-width: 380px){
  .hour {

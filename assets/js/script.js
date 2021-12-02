@@ -118,6 +118,18 @@ $(document).ready(function() {
     
     // save schedule to storage
     saveToStorage ();
+
+    // added save alert message to notify user save was successful
+    var scheduleHeader = $(".jumbotron")
+      .addClass("padding-adj");
+    var saveAlertEl = $("<p>")
+      .addClass("lead save-alert")
+      .text("Time Block Saved!")
+    scheduleHeader.append(saveAlertEl)
+    setTimeout(function() { 
+      saveAlertEl.remove()
+      scheduleHeader.removeClass("padding-adj")
+    }, 3000);
   });
 });
 
